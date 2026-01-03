@@ -1,6 +1,7 @@
+from __future__ import annotations
 import logging
 import voluptuous as vol
-from typing import Any, Optional, Tuple
+from typing import Any
 from .bjled import BJLEDInstance
 from .const import DOMAIN
 
@@ -55,7 +56,7 @@ class BJLEDLight(LightEntity):
         return self._instance.rgb_color
     
     @property
-    def is_on(self) -> Optional[bool]:
+    def is_on(self) -> bool | None:
         return self._instance.is_on
 
     @property

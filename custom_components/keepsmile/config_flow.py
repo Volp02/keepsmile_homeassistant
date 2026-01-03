@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 from .bjled import BJLEDInstance
 from typing import Any
@@ -127,7 +128,7 @@ class BJLEDFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors={})
 
-    async def async_step_validate(self, user_input: "dict[str, Any] | None" = None):
+    async def async_step_validate(self, user_input: dict[str, Any] | None = None):
         print("step_validate")
         if user_input is not None:
             if "flicker" in user_input:
@@ -156,7 +157,7 @@ class BJLEDFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ), errors={})
 
-    async def async_step_manual(self, user_input: "dict[str, Any] | None" = None):
+    async def async_step_manual(self, user_input: dict[str, Any] | None = None):
         print("step_manual")
         if user_input is not None:            
             self.mac = user_input[CONF_MAC]

@@ -1,19 +1,34 @@
-# BJ_LED
+# Keepsmile Custom (Fork of BJ_LED/Keepsmile)
+
+**This is a fixed and enhanced version of the original Keepsmile/BJ_LED integration.**
+
+## Key Improvements in this Version
+*   **Fix Dependency Issues**: Resolves "Config flow could not be loaded: 500 Internal Server Error" by vendoring the `cheshire` library correctly.
+*   **Fix Brightness/Color Control**: Implements a fix for KS03/KSxx devices that ignored commands unless the Effect mode was strictly reset.
+*   **Crash Protection**: Adds safety checks for device model detection to prevent crashes with unsupported or novel device signatures.
+*   **Renamed Domain**: Renamed to `keepsmile_custom` to allow side-by-side installation or clean migration from other broken forks.
+
+> [!NOTE]
+> **Disclaimer**: This fork was created with heavy assistance from AI agents. While it has been verified to fix the specific issues mentioned (500 errors, brightness control), there may be edge cases or unverified behaviors in other parts of the code.
+
+---
+
+# BJ_LED / Keepsmile
 
 Home Assistant custom integration for BJ_LED devices controlled by the MohuanLED app over Bluetooth LE.
 
-These were the cheapest Bluetooth controlled LEDs I could find on AliExpress.  5M of 5050 LEDs for £2.67.  The app is basic, but it works.  The IR remote is basic, but it works.  The lights connect to a USB port.
+These were the cheapest Bluetooth controlled LEDs I could find on AliExpress. 5M of 5050 LEDs for £2.67. The app is basic, but it works. The IR remote is basic, but it works. The lights connect to a USB port.
 
 ![image](https://github.com/8none1/bj_led/assets/6552931/686eff8b-ab87-4327-b784-ed91d695f957)
 
-I figured it should be pretty easy to get them working, and it was.  I have no intention of adding this to HACS in any offical capacity, but it should work when you add this repo as a custom repo in HACS.
+I figured it should be pretty easy to get them working, and it was. I have no intention of adding this to HACS in any offical capacity, but it should work when you add this repo as a custom repo in HACS.
 
 There are some btsnoop HCI logs in the `bt_snoops` folder if you want to examine them.
 
 ## Bluetooth LE commands
 
-`69 96 06 01 01`                 - On
-`69 96 02 01 00`                 - Off
+`69 96 06 01 01` - On 
+`69 96 02 01 00` - Off
 
 ### Colours
 
@@ -29,7 +44,7 @@ There are some btsnoop HCI logs in the `bt_snoops` folder if you want to examine
 69 96 05 02 ff ff ff ff        - white
 ```
 
-In fact, you only need to provide RGB and can skip the last byte.  Since these strips don't have an white LED, it's easier to make sense of the shorter packet.
+In fact, you only need to provide RGB and can skip the last byte. Since these strips don't have an white LED, it's easier to make sense of the shorter packet.
 
 ### Mode
 
@@ -43,14 +58,13 @@ In fact, you only need to provide RGB and can skip the last byte.  Since these s
 
 Mode are numbered `00` to `15`.
 
-Speed is 01 fast to 0a slow.  There are values accepted above this, but strange things happen.
+Speed is `01` fast to `0a` slow. There are values accepted above this, but strange things happen.
 
 ## Supported devices
 
 This has only been tested with a single generic LED strip from Ali Express.
 
-It reports itself as `BJ_LED` over Bluetooth LE.  The app is called `MohuanLED`.
-MAC address seem to start `FF:FF:xx:xx:xx:xx`.
+It reports itself as `BJ_LED` over Bluetooth LE. The app is called `MohuanLED`. MAC address seem to start `FF:FF:xx:xx:xx:xx`.
 
 ## Supported Features in this integration
 
@@ -68,7 +82,7 @@ MAC address seem to start `FF:FF:xx:xx:xx:xx`.
 
 The timer/clock functions are understandable from the HCI Bluetooth logs but adding that functionality seems pointless and I don't think Home Assistant would support it any way.
 
-The discovery of the light's state requires that the device be able to tell us what state it is in.  The BT controller on the device does report that it has `notify` capabilities but I have not been able to get it to report anything at all.  Perhaps you will have more luck.  Until this is solved, we have to use these lights in `optimistic` mode and assume everything just worked.  Looking at HCI logs from the Android app it doesn't even try to enable notifications and never receives a packet from the light.
+The discovery of the light's state requires that the device be able to tell us what state it is in. The BT controller on the device does report that it has `notify` capabilities but I have not been able to get it to report anything at all. Perhaps you will have more luck. Until this is solved, we have to use these lights in `optimistic` mode and assume everything just worked. Looking at HCI logs from the Android app it doesn't even try to enable notifications and never receives a packet from the light.
 
 ## Installation
 
@@ -78,18 +92,18 @@ You need to have the bluetooth component configured and working in Home Assistan
 
 ### HACS
 
-Add this repo to HACS as a custom repo.  Click through:
+Add this repo to HACS as a custom repo. Click through:
 
-- HACS -> Integrations -> Top right menu -> Custom Repositories
-- Paste the Github URL to this repo in to the Repository box
-- Choose category `Integration`
-- Click Add
-- Restart Home Assistant
-- BJ_LED devices should start to appear in your Integrations page
+1. HACS -> Integrations -> Top right menu -> Custom Repositories
+2. Paste the Github URL to this repo in to the Repository box
+3. Choose category `Integration`
+4. Click Add
+5. Restart Home Assistant
+6. **Keepsmile Custom** devices should start to appear in your Integrations page
 
 ### Config
 
-After setting up, you can config two parameters Settings -> Integrations -> BJ_LED -> Config.
+After setting up, you can config two parameters Settings -> Integrations -> **Keepsmile Custom** -> Config.
 
 ## Credits
 

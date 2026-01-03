@@ -1,4 +1,6 @@
+from __future__ import annotations
 import asyncio
+# Force reload for HA cache update
 from homeassistant.components import bluetooth
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.components.light import (ColorMode)
@@ -13,12 +15,12 @@ from bleak_retry_connector import (
     #ble_device_has_changed,
     establish_connection,
 )
-from cheshire.compiler.compiler import StateCompiler
-from cheshire.compiler.state import LightState
-from cheshire.generic.command import *
-from cheshire.hal.devices import device_profile_from_ble_device
-from cheshire.communication.transmitter import Transmitter
-from typing import Any, TypeVar, cast, Tuple
+from .cheshire.compiler.compiler import StateCompiler
+from .cheshire.compiler.state import LightState
+from .cheshire.generic.command import *
+from .cheshire.hal.devices import device_profile_from_ble_device
+from .cheshire.communication.transmitter import Transmitter
+from typing import Any, TypeVar, cast
 from collections.abc import Callable
 #import traceback
 import logging
@@ -193,6 +195,7 @@ class BJLEDInstance:
         state.update(SwitchCommand(on=True))
         state.update(BrightnessCommand(0xfe))
         state.update(RGBCommand(0x5f, 0x0f, 0x40))
+        state.update(EffectCommand(Effect.NONE)) # Ensure we start in a known mode (Color mode)
 
         return state
 
@@ -204,6 +207,7 @@ class BJLEDInstance:
                 device.name,
                 device.address
             )
+            raise ConfigEntryNotReady(f"Device {device.name} ({device.address}) not supported")
 
         self._compiler = profile.compiler()
         
@@ -222,7 +226,8 @@ class BJLEDInstance:
         platform_commands = self._compiler.compile(self._state)
         LOGGER.debug(f"Sending commands to {self.name}: {platform_commands}")
         await self._ensure_connected()
-        await self._transmitter.send_all(platform_commands)
+        if self._transmitter:
+             await self._transmitter.send_all(platform_commands)
 
     @property
     def mac(self):
@@ -265,8 +270,9 @@ class BJLEDInstance:
         return self._color_mode
 
     @retry_bluetooth_connection_error
-    async def set_rgb_color(self, rgb: Tuple[int, int, int], brightness: int | None = None):
+    async def set_rgb_color(self, rgb: tuple[int, int, int], brightness: int | None = None):
         self._rgb_color = rgb
+        self._effect = None # Explicitly clear effect tracking
         if brightness is None:
             if self._brightness is None:
                 self._brightness = 254
@@ -275,6 +281,7 @@ class BJLEDInstance:
         # RGB packet
         self._state.update(RGBCommand(*rgb))
         self._state.update(BrightnessCommand(brightness))
+        self._state.update(EffectCommand(Effect.NONE)) # Explicitly set Effect to NONE to ensure compiler uses RGB mode
         await self._write_state()
 
 
@@ -354,6 +361,7 @@ class BJLEDInstance:
 
             self._cached_services = None
             self._transmitter = None
+            transmitter = None
             try:
                 transmitter = self._model.get_transmitter(client)
 
@@ -364,14 +372,15 @@ class BJLEDInstance:
                 try:
                     services = await client.get_services()
                     LOGGER.debug(f"Tried reloading characteristrics: {services.characteristics}")
-                    transmitter = self._model.get_transmitter(self._client)
+                    transmitter = self._model.get_transmitter(client)
 
                 except ConnectionError:
                     LOGGER.debug("Connection failed (x2): failed to wrap client with transmitter", exc_info=True)
             self._cached_services = client.services
 
             self._client = client
-            self._transmitter = transmitter
+            if transmitter:
+                self._transmitter = transmitter
             self._reset_disconnect_timer()
 
     def _reset_disconnect_timer(self) -> None:

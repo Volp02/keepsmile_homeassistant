@@ -43,15 +43,25 @@
       "local_name": "KS13-*"
     }
   ],
-  "domain": "keepsmile",
-  "name": "Keepsmile",
-  "codeowners": ["@themooer1"],
+  "domain": "keepsmile_custom",
+  "name": "Keepsmile Custom",
+  "codeowners": [
+    "@Volp02"
+  ],
   "config_flow": true,
-  "dependencies": ["bluetooth_adapters"],
-  "documentation": "https://github.com/themooer1/keepsmile_homeassistant",
+  "dependencies": [
+    "bluetooth_adapters"
+  ],
+  "homeassistant": "2024.1.0",
+  "documentation": "https://github.com/Volp02/keepsmile_homeassistant",
   "integration_type": "device",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/themooer1/keepsmile_homeassistant/issues",
-  "requirements": ["bluetooth-data-tools", "bleak-retry-connector>=1.17.1","bleak>=0.17.0", "cheshire>=0.5.6"],
-  "version": "0.0.2"
+  "issue_tracker": "https://github.com/Volp02/keepsmile_homeassistant/issues",
+  "requirements": [
+    "bluetooth-data-tools",
+    "bleak-retry-connector>=1.17.1",
+    "bleak>=0.17.0",
+    "typing-extensions>=4.14.0"
+  ],
+  "version": "0.0.4"
 }
